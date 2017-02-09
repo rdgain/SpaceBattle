@@ -51,7 +51,7 @@ public class SingleMCTSPlayer
         //Set the game observation to a newly root node.
         //System.out.println("learning_style = " + learning_style);
 
-        if (m_root != null && m_root.children[action] != null && false) {//controllers.multiPlayer.ea.Agent.useShiftBuffer) {
+        if (m_root != null && m_root.children[action] != null && Agent.keepTree) {
             m_root = m_root.children[action];
         } else {
             m_root = new SingleTreeNode(m_rnd, NUM_ACTIONS, actions, id, oppID, no_players);

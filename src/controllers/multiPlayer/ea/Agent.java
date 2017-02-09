@@ -8,6 +8,7 @@ import evodef.EvoAlg;
 import evodef.GameActionSpaceAdapter;
 import evodef.GameActionSpaceAdapterMulti;
 import evodef.SearchSpaceUtil;
+import ga.SimpleRMHC;
 import ontology.Types;
 import tools.ElapsedCpuTimer;
 
@@ -20,9 +21,10 @@ import java.util.Arrays;
 public class Agent extends AbstractMultiPlayer {
 
     public int num_actions;
-
-    public static boolean useShiftBuffer = true;
     public static int SEQUENCE_LENGTH = 25;
+    public static boolean useShiftBuffer = true;
+    public static boolean useHeuristic = true;
+    public static boolean useDiscountFactor = true;
 
     int nEvals;
 
@@ -42,16 +44,22 @@ public class Agent extends AbstractMultiPlayer {
      * @param so state observation of the current game.
      * @param elapsedTimer Timer for the controller creation.
      */
-    public Agent(StateObservationMulti so, ElapsedCpuTimer elapsedTimer, EvoAlg evoAlg, int playerID, int nEvals)
+    public Agent(StateObservationMulti so, ElapsedCpuTimer elapsedTimer, int playerID)
     {
         //get game information
 
-        this.evoAlg = evoAlg;
+        double kExplore = 10;
+        int nNeighbours = 100;
+
+        // evoAlg = new NTupleBanditEA(kExplore, nNeighbours);
+
+        int nResamples = 3;
+        this.evoAlg = new SimpleRMHC(nResamples);
 
         no_players = so.getNoPlayers();
         id = playerID;
         oppID = (id + 1) % so.getNoPlayers();
-        this.nEvals = nEvals;
+//        this.nEvals = 1000;
 
         //Get the actions for all players in a static array.
 
@@ -85,6 +93,7 @@ public class Agent extends AbstractMultiPlayer {
     // will only recalculate after this number of steps
     static int playoutLength = 1;
 
+
     @Override
     public Types.ACTIONS act(StateObservationMulti stateObs, ElapsedCpuTimer elapsedCpuTimer) {
         //Set the state observation object as the new root of the tree.
@@ -95,15 +104,17 @@ public class Agent extends AbstractMultiPlayer {
         int action1;
         GameActionSpaceAdapterMulti game = new GameActionSpaceAdapterMulti(stateObs, SEQUENCE_LENGTH, id, oppID);
 
+        GameActionSpaceAdapterMulti.useHeuristic = useHeuristic;
+        GameActionSpaceAdapterMulti.useDiscountFactor = useDiscountFactor;
+
         if (solution != null) {
             solution = SearchSpaceUtil.shiftLeftAndRandomAppend(solution, game);
             evoAlg.setInitialSeed(solution);
         }
 
-        solution = evoAlg.runTrial(game, nEvals);
+        solution = evoAlg.runTrial(game, elapsedCpuTimer);
 
-        game.evaluate(solution);
-//        System.out.println(Arrays.toString(solution) + "\t " + );
+        // System.out.println(Arrays.toString(solution) + "\t " + game.evaluate(solution));
 
         action1 = solution[0];
         // already return the first element, so now set it to 1 ...
@@ -117,7 +128,6 @@ public class Agent extends AbstractMultiPlayer {
 
         return actions[id][action1];
     }
-
 
 
 }

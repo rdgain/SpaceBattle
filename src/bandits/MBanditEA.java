@@ -6,6 +6,7 @@ import evodef.SolutionEvaluator;
 import evomaze.MazeView;
 import evomaze.ShortestPathTest;
 import ntuple.NTupleSystem;
+import tools.ElapsedCpuTimer;
 import utilities.ElapsedTimer;
 import utilities.StatSummary;
 
@@ -94,5 +95,10 @@ public class MBanditEA implements EvoAlg {
         }
 
         return genome.toArray();
+    }
+
+    @Override
+    public int[] runTrial(SolutionEvaluator evaluator, ElapsedCpuTimer timer) {
+        return new int[0];
     }
 }

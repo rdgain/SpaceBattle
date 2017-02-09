@@ -1,13 +1,11 @@
 package ga;
 
-import evodef.EvoAlg;
-import evodef.SearchSpace;
-import evodef.SearchSpaceUtil;
-import evodef.SolutionEvaluator;
+import evodef.*;
 import evogame.Mutator;
 import evomaze.MazeView;
 import evomaze.ShortestPathTest;
 import ntuple.NTupleSystem;
+import tools.ElapsedCpuTimer;
 import utilities.ElapsedTimer;
 import utilities.StatSummary;
 
@@ -50,22 +48,29 @@ public class SimpleRMHC implements EvoAlg {
         this.seed = seed;
     }
 
-
-    /**
-     *
-     * @param evaluator
-     * @param maxEvals
-     * @return: the solution coded as an array of int
-     */
     @Override
-    public int[] runTrial(SolutionEvaluator evaluator, int maxEvals) {
+    public int[] runTrial(SolutionEvaluator evaluator, int nEvals) {
+        return new int[0];
+    }
+
+
+    public int[] runTrial(SolutionEvaluator evaluator, ElapsedCpuTimer timer) {
         init(evaluator);
         StatSummary fitBest = fitness(evaluator, bestYet, new StatSummary());
         Mutator mutator = new Mutator(searchSpace);
 
 
+        long avgTime = 0;
+        long totalTime = 0;
+        int iters = 0;
+        int remainingLimit = 5;
+        long remaining = timer.remainingTimeMillis();
 
-        while (evaluator.nEvals() < maxEvals && !evaluator.optimalFound()) {
+//        while (evaluator.nEvals() < nEvals && !evaluator.optimalFound()) {
+        while (remaining > avgTime*2 && remaining > remainingLimit && !evaluator.optimalFound()) {
+
+            ElapsedCpuTimer iterTimer = new ElapsedCpuTimer();
+
             // System.out.println("nEvals: " + evaluator.nEvals());
             int[] mut = mutator.randMut(bestYet);
             // int[] mut = randMutAll(bestYet);
@@ -98,6 +103,12 @@ public class SimpleRMHC implements EvoAlg {
                     }
                 }
             }
+
+            iters++;
+            totalTime += iterTimer.elapsedMillis();
+            avgTime = totalTime/iters;
+
+            remaining = timer.remainingTimeMillis();
         }
         // System.out.println("Ran for: " + evaluator.nEvals());
         return bestYet;

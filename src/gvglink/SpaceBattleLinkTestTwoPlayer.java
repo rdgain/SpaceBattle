@@ -31,7 +31,7 @@ public class SpaceBattleLinkTestTwoPlayer {
 
     public static void main(String[] args) {
         StatSummary ss = new StatSummary();
-        int nTrials = 20;
+        int nTrials = 1;
         ElapsedTimer t = new ElapsedTimer();
 
         ArrayList<Double> results = new ArrayList<>();
@@ -80,23 +80,16 @@ public class SpaceBattleLinkTestTwoPlayer {
 //                new controllers.singlePlayer.sampleOLMCTS.Agent(linkState, timer);
 
 
-        int nEvals = 1000;
         int idPlayer1 = 0;
         int idPlayer2 = 1;
-        player1 = new controllers.multiPlayer.discountOLMCTS.Agent(linkState, timer, 0, nEvals);
+        player1 = new controllers.multiPlayer.discountOLMCTS.Agent(linkState, timer, 0);
 
 
         // try the evolutionary players
 
-        int nResamples = 3;
-        EvoAlg evoAlg = new SimpleRMHC(nResamples);
 
-        double kExplore = 10;
-        int nNeighbours = 100;
 
-        // evoAlg = new NTupleBanditEA(kExplore, nNeighbours);
-
-        player2 = new controllers.multiPlayer.ea.Agent(linkState, timer, evoAlg, idPlayer2, nEvals);
+        player2 = new controllers.multiPlayer.ea.Agent(linkState, timer, idPlayer2);
 
 
         // player1  = new controllers.multiPlayer.smlrand.Agent();
@@ -125,14 +118,36 @@ public class SpaceBattleLinkTestTwoPlayer {
             new JEasyFrame(view, "Simple Battle Game");
         }
 
+        StatSummary sst1 = new StatSummary("Player 1 Elapsed Time");
+        StatSummary sst2 = new StatSummary("Player 2 Elapsed Time");
+
+        StatSummary ssTicks1 = new StatSummary("Player 1 nTicks");
+        StatSummary ssTicks2 = new StatSummary("Player 2 nTicks");
+
         for (int i=0; i<nSteps && !linkState.isGameOver(); i++) {
             timer = new ElapsedCpuTimer();
             timer.setMaxTimeMillis(thinkingTime);
 
+            ElapsedTimer t1 = new ElapsedTimer();
 
+            // keep track of the number of game ticks used by each algorithm
+            int ticks;
+
+            ticks = SpaceBattleLinkStateTwoPlayer.nTicks;
             Types.ACTIONS action1 = player1.act(multi.copy(), timer);
-            Types.ACTIONS action2 = player2.act(multi.copy(), timer);
+            sst1.add(t1.elapsed());
+            ticks = SpaceBattleLinkStateTwoPlayer.nTicks - ticks;
+            ssTicks1.add(ticks);
+            // System.out.println("Player 1 Ticks = " + ticks);
 
+            ElapsedTimer t2 = new ElapsedTimer();
+            ticks = SpaceBattleLinkStateTwoPlayer.nTicks;
+            Types.ACTIONS action2 = player2.act(multi.copy(), timer);
+            sst2.add(t2.elapsed());
+            ticks = SpaceBattleLinkStateTwoPlayer.nTicks - ticks;
+            ssTicks2.add(ticks);
+
+            // System.out.println("Player 2 Ticks = " + ticks);
             multi.advance(new Types.ACTIONS[]{action1, action2});
 
             if (view != null) {
@@ -142,7 +157,7 @@ public class SpaceBattleLinkTestTwoPlayer {
                 } catch (Exception e) {}
             }
 
-            System.out.println(multi.getGameScore());
+            // System.out.println(multi.getGameScore());
         }
 
         System.out.println(multi.getGameScore());
@@ -150,6 +165,11 @@ public class SpaceBattleLinkTestTwoPlayer {
 
         // System.out.println(SingleTreeNode.rollOutScores);
 
+        System.out.println(sst1);
+        System.out.println(sst2);
+
+        System.out.println(ssTicks1);
+        System.out.println(ssTicks2);
         return multi.getGameScore(0);
 
     }

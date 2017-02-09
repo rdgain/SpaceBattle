@@ -2,6 +2,7 @@ package ntuple;
 
 import evodef.*;
 import evogame.Mutator;
+import tools.ElapsedCpuTimer;
 import utilities.Picker;
 
 import java.util.Arrays;
@@ -102,6 +103,11 @@ public class NTupleBanditEA  implements EvoAlg {
         int[] solution = nTupleSystem.getBestOfSampledPlusNeighbours(neighboursWhenFindingBest);
         logger.keepBest(solution, evaluator.evaluate(solution));
         return solution;
+    }
+
+    @Override
+    public int[] runTrial(SolutionEvaluator evaluator, ElapsedCpuTimer timer) {
+        return new int[0];
     }
 
 

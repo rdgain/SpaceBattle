@@ -5,7 +5,6 @@ import gvglink.SpaceBattleLinkStateTwoPlayer;
 import ontology.Types;
 import tools.ElapsedCpuTimer;
 import tools.Utils;
-import static evodef.GameActionSpaceAdapterMulti.*;
 
 import java.util.Random;
 
@@ -25,9 +24,8 @@ public class SingleTreeNode
     public int childIdx;
 
     public static int MCTS_ITERATIONS = 100;
-    public int ROLLOUT_DEPTH = 25;
+    public int ROLLOUT_DEPTH = 10;
     public double K = Math.sqrt(2);
-    public double REWARD_DISCOUNT = 1.00;
     public int[] NUM_ACTIONS;
     public Types.ACTIONS[][] actions;
     public int id, oppID, no_players;
@@ -68,8 +66,8 @@ public class SingleTreeNode
         int numIters = 0;
 
         int remainingLimit = 5;
-//        while(remaining > 2*avgTimeTaken && remaining > remainingLimit){
-        while(numIters < MCTS_ITERATIONS){
+        while(remaining > 2*avgTimeTaken && remaining > remainingLimit){
+//        while(numIters < MCTS_ITERATIONS){
 
             StateObservationMulti state = rootState.copy();
 
@@ -218,7 +216,7 @@ public class SingleTreeNode
 
         double delta = value(state);
 
-        if (useDiscountFactor) {
+        if (Agent.useDiscountFactor) {
             delta = totValue / denom;
         } else {
             delta = value(state);
@@ -241,11 +239,11 @@ public class SingleTreeNode
 
         Types.WINNER win = a_gameState.getMultiGameWinner()[id];
         double rawScore;
-        if (useHeuristic && a_gameState instanceof SpaceBattleLinkStateTwoPlayer) {
+        if (Agent.useHeuristic && a_gameState instanceof SpaceBattleLinkStateTwoPlayer) {
             SpaceBattleLinkStateTwoPlayer state1 = (SpaceBattleLinkStateTwoPlayer) a_gameState.copy();
             rawScore = state1.getHeuristicScore();
         } else {
-            rawScore = a_gameState.getGameScore(id) - initScore;
+            rawScore = a_gameState.getGameScore(id);// - initScore;
         }
 
 
@@ -309,7 +307,7 @@ public class SingleTreeNode
 
         if (selected == -1)
         {
-            System.out.println("Unexpected selection!");
+//            System.out.println("Unexpected selection!");
             selected = 0;
         }else if(allEqual)
         {

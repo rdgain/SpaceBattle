@@ -23,12 +23,16 @@ public class Agent extends AbstractMultiPlayer {
 
     protected SingleMCTSPlayer mctsPlayer;
 
+    public static boolean keepTree = false;
+    public static boolean useHeuristic = false;
+    public static boolean useDiscountFactor = false;
+
     /**
      * Public constructor with state observation and time due.
      * @param so state observation of the current game.
      * @param elapsedTimer Timer for the controller creation.
      */
-    public Agent(StateObservationMulti so, ElapsedCpuTimer elapsedTimer, int playerID, int nEvals)
+    public Agent(StateObservationMulti so, ElapsedCpuTimer elapsedTimer, int playerID)
     {
         //get game information
 
@@ -53,7 +57,7 @@ public class Agent extends AbstractMultiPlayer {
 
         //Create the player.
 
-        SingleTreeNode.MCTS_ITERATIONS = nEvals;
+//        SingleTreeNode.MCTS_ITERATIONS = 1000;
         mctsPlayer = getPlayer(so, elapsedTimer, NUM_ACTIONS, actions, id, oppID, no_players);
     }
 

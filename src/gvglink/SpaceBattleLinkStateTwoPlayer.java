@@ -17,6 +17,7 @@ public class SpaceBattleLinkStateTwoPlayer
         extends StateObservationMulti {
 
     static int maxTick = 500;
+    public static int nTicks = 0;
 
     // this class is already 2-player ready
     SimpleBattleState state;
@@ -79,6 +80,7 @@ public class SpaceBattleLinkStateTwoPlayer
         score = state.score[0] - state.score[1];
         tick++;
 
+        nTicks++;
     }
 
 

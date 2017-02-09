@@ -13,17 +13,17 @@ import java.util.Random;
  * Created by sml on 20/01/2017.
  */
 public class GameActionSpaceAdapterMulti implements FitnessSpace {
-    StateObservationMulti stateObservation;
+    public StateObservationMulti stateObservation;
     int sequenceLength;
     EvolutionLogger logger;
     int nEvals;
     public static boolean useDiscountFactor = true;
-    public static boolean useHeuristic = false;
-    public static Random random = new Random();
-    public static double noiseLevel = 0;
+    public static boolean useHeuristic = true;
+    static Random random = new Random();
+    static double noiseLevel = 0;
 
     public int numActions;
-    public Types.ACTIONS[] gvgaiActions;
+    public Types.ACTIONS[][] gvgaiActions;
 
 
     // this is used to value future rewards less
@@ -45,13 +45,16 @@ public class GameActionSpaceAdapterMulti implements FitnessSpace {
         this.stateObservation = stateObservation;
         this.sequenceLength = sequenceLength;
 
-        ArrayList<Types.ACTIONS> act = stateObservation.getAvailableActions();
-        gvgaiActions = new Types.ACTIONS[act.size()];
-        for(int i = 0; i < gvgaiActions.length; ++i)
-        {
-            gvgaiActions[i] = act.get(i);
+        gvgaiActions = new Types.ACTIONS[stateObservation.getNoPlayers()][];
+        for (int i = 0; i < stateObservation.getNoPlayers(); i++) {
+            ArrayList<Types.ACTIONS> act = stateObservation.getAvailableActions(i);
+            gvgaiActions[i] = new Types.ACTIONS[act.size()];
+            for (int j = 0; j < act.size(); ++j) {
+                gvgaiActions[i][j] = act.get(i);
+            }
         }
-        numActions = gvgaiActions.length;
+
+        numActions = gvgaiActions[playerID].length;
         logger = new EvolutionLogger();
         nEvals = 0;
         this.playerID = playerID;
@@ -72,6 +75,8 @@ public class GameActionSpaceAdapterMulti implements FitnessSpace {
         return numActions;
     }
 
+    public void setNumActions(int numActions) {this.numActions = numActions;}
+
     @Override
     public void reset() {
         // no action is needed apart from resetting the count;
@@ -83,8 +88,20 @@ public class GameActionSpaceAdapterMulti implements FitnessSpace {
     @Override
     public double evaluate(int[] actions) {
         // take a copy of the current game state and accumulate the score as we go along
-
         StateObservationMulti obs = stateObservation.copy();
+
+        gvgaiActions = new Types.ACTIONS[obs.getNoPlayers()][];
+        for (int i = 0; i < obs.getNoPlayers(); i++) {
+            ArrayList<Types.ACTIONS> act = obs.getAvailableActions(i);
+            gvgaiActions[i] = new Types.ACTIONS[act.size()];
+            for (int j = 0; j < act.size(); ++j) {
+                gvgaiActions[i][j] = act.get(i);
+            }
+        }
+
+        numActions = gvgaiActions[playerID].length;
+        int numActionsOpp = gvgaiActions[opponentID].length;
+
         // note the score now - for normalisation reasons
         // we wish to track the change in score, not the absolute score
         double initScore = obs.getGameScore(playerID);
@@ -98,10 +115,10 @@ public class GameActionSpaceAdapterMulti implements FitnessSpace {
             // hence an array of actions
             // the idea is that we'll pad out the
             int myAction = actions[i];
-            int opAction = random.nextInt(obs.getAvailableActions(opponentID).size());
+            int opAction = random.nextInt(numActionsOpp);
             Types.ACTIONS[] acts = new Types.ACTIONS[2];
-            acts[playerID] = gvgaiActions[myAction];
-            acts[opponentID] = gvgaiActions[opAction];
+            acts[playerID] = gvgaiActions[playerID][myAction];
+            acts[opponentID] = gvgaiActions[opponentID][opAction];
 
             obs.advance(acts);
 
