@@ -33,6 +33,9 @@ public class GameActionSpaceAdapterMulti implements FitnessSpace {
     int playerID;
     int opponentID;
 
+    private final double HUGE_NEGATIVE = -10000000.0;
+    private final double HUGE_POSITIVE =  10000000.0;
+
 
     /**
      * For now assume that the number of actions available at each game tick is always
@@ -50,7 +53,7 @@ public class GameActionSpaceAdapterMulti implements FitnessSpace {
             ArrayList<Types.ACTIONS> act = stateObservation.getAvailableActions(i);
             gvgaiActions[i] = new Types.ACTIONS[act.size()];
             for (int j = 0; j < act.size(); ++j) {
-                gvgaiActions[i][j] = act.get(i);
+                gvgaiActions[i][j] = act.get(j);
             }
         }
 
@@ -95,7 +98,7 @@ public class GameActionSpaceAdapterMulti implements FitnessSpace {
             ArrayList<Types.ACTIONS> act = obs.getAvailableActions(i);
             gvgaiActions[i] = new Types.ACTIONS[act.size()];
             for (int j = 0; j < act.size(); ++j) {
-                gvgaiActions[i][j] = act.get(i);
+                gvgaiActions[i][j] = act.get(j);
             }
         }
 
@@ -110,6 +113,10 @@ public class GameActionSpaceAdapterMulti implements FitnessSpace {
         double discountedTot = 0;
 
         for (int i=0; i<sequenceLength; i++) {
+
+            if (obs.isGameOver()) {
+                break;
+            }
 
             // Note here that we need to look at the advance method which takes multiple players
             // hence an array of actions
@@ -136,9 +143,19 @@ public class GameActionSpaceAdapterMulti implements FitnessSpace {
         if (useDiscountFactor) {
             delta = discountedTot / denom;
         } else {
-            delta = obs.getGameScore() - initScore;
+            delta = obs.getGameScore(playerID) - initScore;
         }
+
+        if (obs.isGameOver()) {
+            boolean iWon = obs.getMultiGameWinner()[playerID] == Types.WINNER.PLAYER_WINS;
+            boolean theyWon = obs.getMultiGameWinner()[opponentID] == Types.WINNER.PLAYER_WINS;
+            if (iWon)
+                delta += HUGE_POSITIVE;
+            else delta += HUGE_NEGATIVE;
+        }
+
         delta += noiseLevel * random.nextGaussian();
+
         return delta;
     }
 

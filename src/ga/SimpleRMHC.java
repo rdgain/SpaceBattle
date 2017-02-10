@@ -9,6 +9,7 @@ import tools.ElapsedCpuTimer;
 import utilities.ElapsedTimer;
 import utilities.StatSummary;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class SimpleRMHC implements EvoAlg {
@@ -104,6 +105,8 @@ public class SimpleRMHC implements EvoAlg {
                 }
             }
 
+//            System.out.println(iters + ": " + Arrays.toString(bestYet) + " " + fitBest.mean());
+
             iters++;
             totalTime += iterTimer.elapsedMillis();
             avgTime = totalTime/iters;
@@ -111,6 +114,9 @@ public class SimpleRMHC implements EvoAlg {
             remaining = timer.remainingTimeMillis();
         }
         // System.out.println("Ran for: " + evaluator.nEvals());
+
+//        System.out.println("--------------------------");
+
         return bestYet;
     }
 

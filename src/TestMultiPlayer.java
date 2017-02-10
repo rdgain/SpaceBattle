@@ -26,7 +26,7 @@ public class TestMultiPlayer
         String discountOLMCTS = "controllers.multiPlayer.discountOLMCTS.Agent";
 
         //Set here the controllers used in the games (need 2 separated by space).
-        String controllers = RMHC + " " + discountOLMCTS;
+        String controllers = discountOLMCTS  + " " +  RMHC ;
         //String controllers = sampleOLMCTSController + " " + sampleOLMCTSController;
 
         //Available games:
@@ -44,8 +44,8 @@ public class TestMultiPlayer
                 "upgrade-x", "uphigh", "warzone", "watchout", "wheelme"};                           // 35-39
 
         //Training Set 1
-        games = new String[]{"akkaarrh", "asteroids", "captureflag", "copsNrobbers", "gotcha",      // 0-4
-                "klax", "samaritan", "sokoban", "steeplechase", "tron"};                            // 5-9
+//        games = new String[]{"akkaarrh", "asteroids", "captureflag", "copsNrobbers", "gotcha",      // 0-4
+//                "klax", "samaritan", "sokoban", "steeplechase", "tron"};                            // 5-9
 
         // Test set CIG 2016
 //        games = new String[]{"egghunt", "fatty", "isawsanta", "mimic", "reflection",                // 0-4
@@ -56,7 +56,7 @@ public class TestMultiPlayer
         int seed = new Random().nextInt();
 
         //Game and level to play
-        int gameIdx = 1;
+        int gameIdx = 2;
         int levelIdx = 0; //level names from 0 to 4 (game_lvlN.txt).
         String game = gamesPath + games[gameIdx] + ".txt";
         String level1 = gamesPath + games[gameIdx] + "_lvl" + levelIdx +".txt";
@@ -68,7 +68,7 @@ public class TestMultiPlayer
 
         // 2. This plays a game in a level by the controllers. If one of the players is human, change the playerID passed
         // to the runOneGame method to be that of the human player (0 or 1).
-//        ArcadeMachine.runOneGame(game, level1, visuals, controllers, recordActionsFile, seed, 0);
+        ArcadeMachine.runOneGame(game, level1, visuals, controllers, recordActionsFile, seed, 0);
         
         // 3. This replays a game from an action file previously recorded
         //String readActionsFile = recordActionsFile;
@@ -84,21 +84,22 @@ public class TestMultiPlayer
 //        }
 
         //5. This plays N games, in the first L levels, M times each. Actions to file optional (set saveActions to true).
-        int N = 2, L = 1, M = 5;
-        boolean saveActions = false;
-        String[] levels = new String[L];
-        String[] actionFiles = new String[L*M];
-        for(int i = 1; i < N; ++i)
-        {
-            int actionIdx = 0;
-            game = gamesPath + games[i] + ".txt";
-            for(int j = 0; j < L; ++j){
-                levels[j] = gamesPath + games[i] + "_lvl" + j +".txt";
-                if(saveActions) for(int k = 0; k < M; ++k)
-                    actionFiles[actionIdx++] = "actions_game_" + i + "_level_" + j + "_" + k + ".txt";
-            }
-            ArcadeMachine.runGames(game, levels, M, controllers, saveActions? actionFiles:null);
-        }
+//        int N = 2, L = 1, M = 10;
+//        boolean saveActions = false;
+//        String[] levels = new String[L];
+//        String[] actionFiles = new String[L*M];
+////        for(int i = 1; i < N; ++i)
+////        {
+//            int actionIdx = 0;
+////            game = gamesPath + games[i] + ".txt";
+//            game = gamesPath + games[N] + ".txt";
+//            for(int j = 0; j < L; ++j){
+//                levels[j] = gamesPath + games[N] + "_lvl" + j +".txt";
+//                if(saveActions) for(int k = 0; k < M; ++k)
+//                    actionFiles[actionIdx++] = "actions_game_" + N + "_level_" + j + "_" + k + ".txt";
+//            }
+//            ArcadeMachine.runGames(game, levels, M, controllers, saveActions? actionFiles:null);
+////        }
 
         //6. This plays a round robin style tournament between multiple controllers, in N games, first L levels, M times each.
         // Controllers are swapped for each match as well. Actions to file optional (set saveActions to true).

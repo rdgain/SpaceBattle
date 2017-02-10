@@ -21,9 +21,9 @@ import java.util.Arrays;
 public class Agent extends AbstractMultiPlayer {
 
     public int num_actions;
-    public static int SEQUENCE_LENGTH = 25;
+    public static int SEQUENCE_LENGTH = 10;
     public static boolean useShiftBuffer = true;
-    public static boolean useHeuristic = true;
+    public static boolean useHeuristic = false;
     public static boolean useDiscountFactor = true;
 
     int nEvals;
@@ -114,7 +114,7 @@ public class Agent extends AbstractMultiPlayer {
 
         solution = evoAlg.runTrial(game, elapsedCpuTimer);
 
-        // System.out.println(Arrays.toString(solution) + "\t " + game.evaluate(solution));
+//        System.out.println(Arrays.toString(solution) + "\t " + game.evaluate(solution));
 
         action1 = solution[0];
         // already return the first element, so now set it to 1 ...
